@@ -75,10 +75,15 @@ $(function() {
     this.mapServiceQueryUrl = '/query?where={where}&text=&objectIds={objectIdList}&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson';
     this.maxIdUrl = this.url + '/query?where=1%3D1&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=&returnGeometry=true&maxAllowableOffset=&outSR=4326&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=[{\'statisticType\':\'min\',\'onStatisticField\':\'objectid\',\'outStatisticFieldName\':\'objectid_min\'},{\'statisticType\':\'max\',\'onStatisticField\':\'objectid\',\'outStatisticFieldName\':\'objectid_max\'}]&returnZ=false&returnM=false&gdbVersion=&f=pjson';
     opts.name ? this.name = opts.name : console.warn('CartONG.ArcgisService.init: name not available.');
-    this.maxRecordCount = opts.maxRecordCount ? opts.maxRecordCount : ''; //TODO [low priority]: to get maxRecordCount and other meta (SR, geometry type...) from the service itself
-
+    //this.maxRecordCount = opts.maxRecordCount ? opts.maxRecordCount : ''; //TODO [low priority]: to get maxRecordCount and other meta (SR, geometry type...) from the service itself
+    
     //this.definitionPromise = this.loadDefinition();
     this.definition;
+
+    //TODO: test line below and adapt getMaxRecordCount method
+    //opts.maxRecordCount ? this.definition = { maxRecordCount: opts.maxRecordCount } : false; 
+    
+    //TODO [low priority]: to get other meta (SR, geometry type...) from the service itself
   }
 
   //get parameter functions
@@ -97,9 +102,9 @@ $(function() {
   CartONG.ArcgisService.prototype.getServiceId = function() {
     return (this.serviceId && this.serviceId != '') ? this.serviceId : 'Not available';
   }
-  CartONG.ArcgisService.prototype.getMaxRecordCount = function() {
+  /*CartONG.ArcgisService.prototype.getMaxRecordCount = function() {
     return (this.maxRecordCount && this.maxRecordCount != '') ? this.maxRecordCount : 'Not available';
-  }
+  }*/
   CartONG.ArcgisService.prototype.getToken = function() {
     //return (this.token && this.token != '') ? this.token : 'Not available';
     var t;
@@ -365,6 +370,7 @@ $(function() {
 
   /**
    * CRUD dependency
+   * TODO: move this to cartong-arcgis-crud
    */
   CartONG.ArcgisService.prototype.delete = function(objectid, callback){
     var promise = $.Deferred()
@@ -396,6 +402,7 @@ $(function() {
 
   /**
    * CRUD dependency
+   * TODO: move this to cartong-arcgis-crud
    */
   CartONG.ArcgisService.prototype.save = function(features, action, callback){
     var promise = $.Deferred()
