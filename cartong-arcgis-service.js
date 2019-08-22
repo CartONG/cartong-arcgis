@@ -271,7 +271,8 @@ $(function() {
   }
 
   CartONG.ArcgisService.prototype.features2csv = function(data, format, geometry) {
-
+    //TODO: rename this method --> features2array?
+    
     var features = [];
     var crs;
     var geometryType;
@@ -291,6 +292,7 @@ $(function() {
       //var properties = feature.properties || features.attributes
       if (format === 'geojson') {
         csv = feature.properties;
+        //TODO: support other geometry types - WKT format?
         if (geometry) {
           csv.geometryType = feature.geometry.type;
           //csv.geometryCoordinates = feature.geometry.coordinates;
@@ -327,7 +329,7 @@ $(function() {
 		var y = new Date().getFullYear()
     var today = "_" + y + m + d
     
-    var filename = "export" + (name ? '_name' : '') + today
+    var filename = "export" + (name ? '_' + name : '') + today
 
     if (format === 'geojson' || format === 'json') {
       //data = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data))
@@ -371,6 +373,7 @@ $(function() {
   /**
    * CRUD dependency
    * TODO: move this to cartong-arcgis-crud
+   * TODO: allow array input to delete several features at the same time
    */
   CartONG.ArcgisService.prototype.delete = function(objectid, callback){
     var promise = $.Deferred()
