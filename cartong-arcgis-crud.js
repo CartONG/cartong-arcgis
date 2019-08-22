@@ -1,3 +1,5 @@
+//TODO: this plugin is not totally finalized. To embed in Arcgis.Service class.
+
 function CRUD(url){
 	//url should look like: http://MyServer/ArcGIS/rest/services/PaulFeaturewgs84/FeatureServer/1
 	this.url=url;

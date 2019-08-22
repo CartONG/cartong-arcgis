@@ -1,5 +1,7 @@
-var bh = window.bh || {};
-bh.ArcgisToken = (function () {
+//TODO: this plugin is not totally finalized. To embed in Arcgis.Service class.
+
+var CartONG = window.CartONG || {};
+CartONG.ArcgisToken = (function () {
 	
 	function ArcgisToken(response) {
 		if (response.token) {
@@ -37,10 +39,10 @@ bh.ArcgisToken = (function () {
 		return this.error.message ? this.error.message : false;
 	}
 	
-	ArcgisToken.request = function (username,password) {
+	ArcgisToken.request = function (username, password, tokenService) {
 
 		// function to generate a token
-		var serverAuth = $.post(bh.Config.tokenService, {
+		var serverAuth = $.post(tokenService, {
 			username: username,
 			password: password,
 			f: 'json',

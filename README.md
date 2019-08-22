@@ -6,8 +6,9 @@ It is divided in several files, each one oriented to a particular problematic. C
 
 - [cartong-arcgis toolset](#cartong-arcgis-toolset)
   - [cartong-arcgis-service](#cartong-arcgis-service)
-    - [CartONG.ArcgisService initialization](#CartONGArcgisService-initialization)
-    - [Methods](#Methods)
+    - [Initialization](#Initialization)
+      - [Possible input options](#Possible-input-options)
+    - [Main methods](#Main-methods)
       - [loadDefinition()](#loadDefinition)
       - [getData([params])](#getDataparams)
       - [getDataByAttribute(attribute, [params])](#getDataByAttributeattribute-params)
@@ -15,28 +16,43 @@ It is divided in several files, each one oriented to a particular problematic. C
       - [export(data, format, [name])](#exportdata-format-name)
       - [save(features, action, [callback])](#savefeatures-action-callback)
       - [delete(objectid, [callback])](#deleteobjectid-callback)
+    - [Other methods](#Other-methods)
     - [Default query parameters](#Default-query-parameters)
+    - [Dependencies](#Dependencies)
   - [cartong-arcgis-token](#cartong-arcgis-token)
+    - [Initialization](#Initialization-1)
+    - [Main methods](#Main-methods-1)
+      - [CartONG.ArcgisToken.request(username, password, tokenServiceURL)](#CartONGArcgisTokenrequestusername-password-tokenServiceURL)
+      - [CartONG.ArcgisToken.fromJSON(tokenResponse)](#CartONGArcgisTokenfromJSONtokenResponse)
+    - [Other methods](#Other-methods-1)
+    - [Dependencies](#Dependencies-1)
   - [cartong-arcgis-crud](#cartong-arcgis-crud)
   - [cartong-arcgis-attachments](#cartong-arcgis-attachments)
-  - [Dependencies](#Dependencies)
+    - [Initialization](#Initialization-2)
+    - [Main methods](#Main-methods-2)
+      - [getAttachments(feature)](#getAttachmentsfeature)
+      - [deleteAttachments(feature, attachments)](#deleteAttachmentsfeature-attachments)
+      - [addAttachments(feature, files)](#addAttachmentsfeature-files)
+    - [Other methods](#Other-methods-2)
+    - [Dependencies](#Dependencies-2)
+  - [Global dependencies](#Global-dependencies)
   - [Task list / Ideas](#Task-list--Ideas)
 ___
 
 ## cartong-arcgis-service
 
-The core component of the toolset, defines `CartONG.ArcgisService` object with the most common methods used with ArcGIS REST services, like different ways to request data (surpassing the services' feature limitation, `maxRecordCount` property), transformation to CSV format, export tool, etc.
+The core component of the toolset, defines `CartONG.ArcgisService` class with the most common methods used with ArcGIS REST services, like different ways to request data (surpassing the services' feature limitation, `maxRecordCount` property), transformation to CSV format, export tool, etc.
 
-### CartONG.ArcgisService initialization
+### Initialization
 
-There are two ways to initialize a `CartONG.ArcgisService` object. The simplest is to pass the service URL as parameter, including the layer ID:
+There are two ways to initialize a `CartONG.ArcgisService` class. The simplest is to pass the service URL as parameter, including the layer ID:
 
 ```js
 var myServiceURL = 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Cities/FeatureServer/0'
 var myService = new CartONG.ArcgisService(myServiceURL)
 ```
 
-If you are more methodic, the service object can also be initialized by passing the parameters that compound the URL separately (domain, service path and service ID) in an object (note that the plugin will just concatenate the three components, so make sure the slashes are correctly used):
+If you are more methodic, the service class can also be initialized by passing the parameters that compound the URL separately (domain, service path and service ID) in an object (note that the plugin will just concatenate the three components, so make sure the slashes are correctly used):
 
 ```js
 var myService = new CartONG.ArcgisService({
@@ -46,7 +62,7 @@ var myService = new CartONG.ArcgisService({
 })
 ```
 
-However, if the service is token protected, there is a third way to initialize the service object, passing the url and the token in a object:
+However, if the service is token protected, there is a third way to initialize the service class, passing the url and the token in a object:
 
 ```js
 var myService = new CartONG.ArcgisService({
@@ -55,11 +71,23 @@ var myService = new CartONG.ArcgisService({
 })
 ```
 
-> :high_brightness: **Tip**: For more information about how to get the ArcGIS token, please go to [cartong-arcgis-token](#cartong-arcgis-token) section.
+#### Possible input options
 
-> :high_brightness: **Tip**: This plugin is built to surpass the `maxRecordCount` limitation that ArcGIS REST services have. To take full advantage of it, please have a look to [`loadDefinition()`](#loaddefinition()) method.
+| Option | Mandatory | What is it |
+| --- | :---: | --- |
+| url | Only if `domain`, `servicePath` and `serviceId` are not given. | Full URL of the service, including layer ID. |
+| domain | Only if `url` is not given. | Domain of the ArcGIS Server. |
+| servicePath | Only if `url` is not given. | Path to the service layer. |
+| serviceId | Only if `url` is not given. | The layer numeric ID. |
+| token | No | The token to access token protected services. Can be set after the initialization. |
+| name | No | A name for the service. Not really used so far. |
 
-### Methods
+
+> :high_brightness: For more information about how to get the ArcGIS token, please go to [cartong-arcgis-token](#cartong-arcgis-token) section.
+
+> :high_brightness: This plugin is built to surpass the `maxRecordCount` limitation that ArcGIS REST services have. To take full advantage of it, please have a look to [`loadDefinition()`](#loaddefinition()) method.
+
+### Main methods
 
 #### loadDefinition()
 
@@ -112,11 +140,11 @@ Convenient method to query a specific field, without using `where` parameter's s
 
 #### features2csv(data, format, [geometry])
 
-> :bell: _**Warning**: This method should be renamed, the output is not really a csv string, but an array of features... And by the way, build an actual features2csv method, including the string parse_
+> :bell: _This method should be renamed, the output is not really a csv string, but an array of features... And by the way, build an actual features2csv method, including the string parse_
 
 Extracts a dataset in GeoJSON or Esri JSON format into an array of features. Each feature is stored in objects, including its geometry and CRS (if requested) at the same level with other feature attributes.
 
-> :bell: _**Warning**: so far it only supports point geometries. For a future global support for other geometry types, WKT geometry format could be a good option._
+> :bell: _So far it only supports point geometries. For a future global support for other geometry types, WKT geometry format could be a good option._
 
 | Parameter | Mandatory | Type | What is it |
 | --- | :---: | :---: | --- |
@@ -128,7 +156,7 @@ Extracts a dataset in GeoJSON or Esri JSON format into an array of features. Eac
 var myFeatureArray = myService.features2csv(dataInGeoJSON, 'geojson', input.returnGeometry)
 ```
 
-> _Disclaimer: This method should actually not need to initialize the `ArcgisService` object. To see with the team how and where it could be placed._
+> _Disclaimer: This method should actually not need to initialize the `ArcgisService` class. To see with the team how and where it could be placed._
 
 #### export(data, format, [name])
 
@@ -149,9 +177,9 @@ service.export(dataInGeoJSON, 'geojson', 'myDatasetName')
 
 > TODO: move this to cartong-arcgis-crud
 
-A `promise` method that stores (add or update options) a list of features in the object's Feature Service. For updates, `objectid` of each feature must be given between the feature's attributes.
+A `promise` method that stores (add or update options) a list of features in the class' Feature Service. For updates, `objectid` of each feature must be given between the feature's attributes.
 
-> This method is only available for Feature Services with these actions enabled.
+> :bell: _This method is only available for Feature Services with these actions enabled._
 
 | Parameter | Mandatory | Type | What is it |
 | --- | :---: | :---: | --- |
@@ -188,9 +216,9 @@ myFeatureService.save(featureArray, 'add')
 
 > TODO: move this to cartong-arcgis-crud
 
-A `promise` method that deletes a feature from the object's Feature Service.
+A `promise` method that deletes a feature from the class' Feature Service.
 
-> This method is only available for Feature Services with this action enabled.
+> :bell: _This method is only available for Feature Services with this action enabled._
 
 | Parameter | Mandatory | Type | What is it |
 | --- | :---: | :---: | --- |
@@ -222,12 +250,22 @@ myFeatureService.delete(12345)
   })
 ```
 
+> _Disclaimer: This method should actually not need to initialize the `ArcgisService` class. To see with the team how and where it could be placed._
 
-> _Disclaimer: This method should actually not need to initialize the `ArcgisService` object. To see with the team how and where it could be placed._
+### Other methods
+
+* `getName()`
+* `getUrl()`
+* `getDomain()`
+* `getServicePath()`
+* `getServiceId()`
+* `getMaxRecordCount()` - disabled for the moment
+* `getToken()`
+* `setToken()`
 
 ### Default query parameters
 
-> :bell: _**Warning**: these parameters might not be totally up to date, check the code in [cartong-arcgis-service](cartong-arcgis-service.js) file._
+> :bell: _These parameters might not be totally up to date, check the code in [cartong-arcgis-service](cartong-arcgis-service.js) file._
 
 ```js
 var defaultQueryParams = {
@@ -266,19 +304,161 @@ var defaultQueryParams = {
 };
 ```
 
+### Dependencies
+
+* [Global dependencies](#global-dependencies)
+* `save()` and `delete()` methods require (cartong-arcgis-crud)[#cartong-arcgis-crud]
+
 ___
 ## cartong-arcgis-token
 
+> :bell: _This plugin is not totally finalized. To embed in `ArcgisService` class._
+
+Tool to easily get a token to access ArcGIS REST services.
+
+### Initialization
+
+Until the plugin is not embedded in `ArcgisService` class, there is no need to initialize it. Just call `CartONG.ArcgisToken.request(username,password, tokenServiceURL)` or `CartONG.ArcgisToken.fromJSON(tokenResponseInJSON)`. Both will return an `ArcgisToken` class with all its methods available.
+
+### Main methods
+
+#### CartONG.ArcgisToken.request(username, password, tokenServiceURL)
+
+Requests a token to the given token service URL, providing the username and password to the ArcGIS Services.
+
+| Parameter | Mandatory | Type | What is it |
+| --- | :---: | :---: | --- |
+| username | Yes | String | Credential to access the given ArcGIS service. |
+| password | Yes | String | Credential to access the given ArcGIS service. |
+| tokenServiceURL | Yes | String | The URL of the token service, normally like this: `https://<arcgis_server_domain>/arcgis/tokens/generateToken`. |
+
+```js
+const username = $('#username').val()
+const password = $('#password').val()
+const tokenService = 'https://<arcgis_server_domain>/arcgis/tokens/generateToken'
+CartONG.ArcgisToken.request(username, password, tokenService)
+  .then(function(token) {
+    // do something with the token
+    // e.g. use it with `ArcgisService` class
+  })
+```
+
+#### CartONG.ArcgisToken.fromJSON(tokenResponse)
+
+Returns an `ArcgisToken` class from a JSON response previously collected by other means. Can be useful, for instance, when the token is temporaly stored in the localStorage of the browser. 
+
+| Parameter | Mandatory | Type | What is it |
+| --- | :---: | :---: | --- |
+| tokenResponse | Yes | object | JSON object with the format of the ArcGIS token service response. |
+
+```js
+var tokenResponse = JSON.parse(localStorage.getItem("arcgis_token"))
+CartONG.ArcgisToken.fromJSON(tokenResponse)
+```
+
+### Other methods
+
+* `isSuccess()`
+* `isExpired()`
+* `getToken()`
+* `getExpire()`
+* `getErrorMessage()`
+
+
+### Dependencies
+
+* [Global dependencies](#global-dependencies)
 
 ___
 ## cartong-arcgis-crud
 
+> :bell: _This plugin is not totally finalized. To embed in `ArcgisService` class._
+
+Tool to manage data transactions through ArcGIS REST services. Available methods are `addFeatures`, `updateFeatures` and `deleteFeatures`.
+
+To use these, it is recommended to `save()` and `delete()` methods currently coded in `ArcgisService` class (they will be probably moved to crud file in the future).
 
 ___
 ## cartong-arcgis-attachments
 
+Toolset to work with attachments through the ArcGIS REST services. It contain methods to get, upload and delete files attached to database features.
+
+### Initialization
+
+To be able to use attachment methods, it is only needed to initialize an `ArcgisService` instance having cartong-arcgis-attachments.js loaded previously.
+
+### Main methods
+
+#### getAttachments(feature)
+
+Returns an array of file properties, including id (number), contentType (string, e.g. "image/png"), size (number, bytes), name (string) of the attachments related to the given feature.
+
+| Parameter | Mandatory | Type | What is it |
+| --- | :---: | :---: | --- |
+| feature | Yes | String or Number | `objectid` of the targeted feature. |
+
+```js
+myService.getAttachments(12345)
+  .done(function(attachments) {
+    // do something with attachments
+  })
+  .fail(function(error) {
+    // error
+  })
+```
+
+#### deleteAttachments(feature, attachments)
+
+Deletes the especified attachments related to the given feature.
+
+| Parameter | Mandatory | Type | What is it |
+| --- | :---: | :---: | --- |
+| feature | Yes | String or Number | `objectid` of the targeted feature. |
+| attachments | Yes | Array | Array of attachment objects, being `id` a mandatory attribute and `name` optional. |
+
+```js
+myService.deleteAttachments(12345, [
+  { id: 2222, name: 'file_1'},
+  { id: 3333},
+])
+  .done(function(response) {
+    // do something on success
+  })
+  .fail(function(error) {
+    // error
+  })
+```
+
+#### addAttachments(feature, files)
+
+Adds several attachments to a feature.
+
+| Parameter | Mandatory | Type | What is it |
+| --- | :---: | :---: | --- |
+| feature | Yes | String or Number | `objectid` of the targeted feature. |
+| files | Yes | Array | Array of `Files` from file input. |
+
+```js
+myService.addAttachments(12345, [<File Object>])
+  .done(function(response) {
+    // do something on success
+  })
+  .fail(function(error) {
+    // error
+  })
+```
+
+### Other methods
+
+* `isAttachmentEnabled()`
+
+### Dependencies
+
+* [cartong-arcgis-service](#cartong-arcgis-service)
+
+
 ___
-## Dependencies
+## Global dependencies
 
 * jQuery | (c) jQuery Foundation - The plugin has been used with v3.1.1
 
@@ -298,3 +478,5 @@ ___
 
 ___
 **Developed by CartONG**
+
+![CartONG Logo](img/cartong_logo_small.png)
