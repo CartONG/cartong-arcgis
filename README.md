@@ -307,7 +307,7 @@ var defaultQueryParams = {
 ### Dependencies
 
 * [Global dependencies](#global-dependencies)
-* `save()` and `delete()` methods require (cartong-arcgis-crud)[#cartong-arcgis-crud]
+* `save()` and `delete()` methods require [cartong-arcgis-crud](#cartong-arcgis-crud)
 
 ___
 ## cartong-arcgis-token
