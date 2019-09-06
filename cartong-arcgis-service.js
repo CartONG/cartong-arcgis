@@ -228,7 +228,7 @@ $(function() {
 
   CartONG.ArcgisService.prototype.queryNextFeatures = function(params, features, promise) {
     
-    var maxObjects = this.definition.maxRecordCount || 995;
+    var maxObjects = (this.definition && this.definition.maxRecordCount) ? this.definition.maxRecordCount : 995;
     //const outFormat = params.f
 
     const queryUrl = getEsriURL({

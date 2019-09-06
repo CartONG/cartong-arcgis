@@ -230,7 +230,9 @@ $(function() {
           //send attachment
           self.addAttachment(feature, file)
           .done(function(res, file) {
-            //debugger
+            debugger
+            //TODO: here is where optional attributes should be sent. 
+            //res format: {"addAttachmentResult":{"objectId":5602,"success":true}} --> use objectid combined with attachment table in feature server
             summary.push({
               file: file,
               res: res,
