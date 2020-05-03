@@ -74,7 +74,13 @@ $(function() {
     this.definitionUrl = this.url + '?f=pjson';
     this.mapServiceQueryUrl = '/query?where={where}&text=&objectIds={objectIdList}&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson';
     this.maxIdUrl = this.url + '/query?where=1%3D1&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=&returnGeometry=true&maxAllowableOffset=&outSR=4326&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=[{\'statisticType\':\'min\',\'onStatisticField\':\'objectid\',\'outStatisticFieldName\':\'objectid_min\'},{\'statisticType\':\'max\',\'onStatisticField\':\'objectid\',\'outStatisticFieldName\':\'objectid_max\'}]&returnZ=false&returnM=false&gdbVersion=&f=pjson';
-    opts.name ? this.name = opts.name : console.warn('CartONG.ArcgisService.init: name not available.');
+    opts.name ? this.name = opts.name : null; //console.warn('CartONG.ArcgisService.init: name not available.');
+    if (opts.attachmentAttributeUrl) {
+      this.attachmentAttributeService = new CartONG.ArcgisService({
+        url: opts.attachmentAttributeUrl,
+        token: this.token
+      })
+    }
     //this.maxRecordCount = opts.maxRecordCount ? opts.maxRecordCount : ''; //TODO [low priority]: to get maxRecordCount and other meta (SR, geometry type...) from the service itself
     
     //this.definitionPromise = this.loadDefinition();

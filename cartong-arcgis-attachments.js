@@ -177,8 +177,9 @@ $(function() {
    * @param {number} feature - Feature's object ID.
    * @param {array} files - Array of Files from file input. 
    */
-  CartONG.ArcgisService.prototype.addAttachments = function(feature, files){
+  CartONG.ArcgisService.prototype.addAttachments = function(feature, files, opts){
     var promise = $.Deferred()
+    opts = opts || {}
     var pendingFiles = 0;
     var summary = []
 
@@ -228,9 +229,9 @@ $(function() {
           
           var file = files[i]
           //send attachment
-          self.addAttachment(feature, file)
+          self.addAttachment(feature, file, opts)
           .done(function(res, file) {
-            debugger
+            //debugger
             //TODO: here is where optional attributes should be sent. 
             //res format: {"addAttachmentResult":{"objectId":5602,"success":true}} --> use objectid combined with attachment table in feature server
             summary.push({
@@ -261,8 +262,9 @@ $(function() {
    * @param {number} feature - Feature's object ID.
    * @param {array} files - A single File from file input. 
    */
-  CartONG.ArcgisService.prototype.addAttachment = function(feature, file){
+  CartONG.ArcgisService.prototype.addAttachment = function(feature, file, opts){
     var promise = $.Deferred()
+    opts = opts || {}
     
     /** function for error --> promise resolve */
     function onError(err) {
@@ -319,7 +321,35 @@ $(function() {
                 }
                 else {
                   // success
-                  promise.resolve(responseTextJson, file);
+
+                  //send attributes if requested and url of attachment feature service is given
+                  if (opts.sendAttributes && self.attachmentAttributeService) {
+
+                    //get attachmentid
+                    const attachmentid = responseTextJson.addAttachmentResult.objectId
+
+                    //build object needed to update attachment's attributes
+                    let attrsToSend = {
+                      attachmentid: attachmentid
+                    }
+                    for (var attr in opts.sendAttributes) {
+                      attrsToSend[attr] = file[attr]
+                    }
+
+                    //save attributes
+                    self.attachmentAttributeService.save([{attributes: attrsToSend}], 'add')
+                      .done(function() {
+                        promise.resolve(responseTextJson, file);
+                      })
+                      .fail(function() {
+                        promise.reject('Error', file)
+                      })
+
+                  }
+                  else {
+                    promise.resolve(responseTextJson, file);
+                  }
+
                 }
               }
               else {
@@ -347,4 +377,3 @@ $(function() {
   }
 
 });
-
