@@ -2,7 +2,9 @@
 
 This toolset is developed in order to help some of the common tasks we face working with ArcGIS REST services and other ArcGIS related tasks.
 
-It is divided in several files, each one oriented to a particular problematic. Current files are the following:
+Disclaimer: This plugin is not any official delivery. It has been developed for internal purposes by CartONG and it is shared for anyone who could benefit from it, but the correct functioning and maintenance cannot be guaranteed by CartONG, especially for new ArcGIS updates. The code has been used with ArcGIS 10.5.1, but has not been widely tested with other versions. We understand that the plugin has its limitations and any report will be welcome.
+
+The code is divided in several files, each one oriented to a particular problematic. Current files are the following:
 
 - [cartong-arcgis toolset](#cartong-arcgis-toolset)
   - [cartong-arcgis-service](#cartong-arcgis-service)
