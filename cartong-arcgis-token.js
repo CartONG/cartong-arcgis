@@ -6,9 +6,8 @@ CartONG.ArcgisToken = (function () {
 	function ArcgisToken(response) {
 		if (response.token) {
 			this.token = response.token;
-			this.expires = response.expires;
-			this.requestTime = response.requestTime ? response.requestTime : new Date().getTime();
-			console.log(this.requestTime);
+			this.expires = response.expires; //in miliseconds
+			this.requestTime = response.requestTime ? response.requestTime : new Date().getTime(); //in miliseconds
 		}
 		else if (response.error) {
 			this.error = {};
@@ -27,7 +26,8 @@ CartONG.ArcgisToken = (function () {
 	}
 	
 	ArcgisToken.prototype.isExpired = function () {
-		return this.requestTime + 1200000 < new Date().getTime(); //1200000 //3647367 //7200000
+		const now = new Date().getTime()
+		return this.expires < now;
 	}
 	ArcgisToken.prototype.getToken = function () {
 		return this.token ? this.token : false;
@@ -39,14 +39,16 @@ CartONG.ArcgisToken = (function () {
 		return this.error.message ? this.error.message : false;
 	}
 	
-	ArcgisToken.request = function (username, password, tokenService) {
+	//ArcgisToken.prototype.request = function (username, password, tokenService, expiration) {
+	ArcgisToken.request = function (username, password, tokenService, expiration) {
+		expiration = expiration || 20 //20 minutes by default if expiration is not expressly provided
 
 		// function to generate a token
 		var serverAuth = $.post(tokenService, {
 			username: username,
 			password: password,
 			f: 'json',
-			expiration: 12000, // 12000 = 20min; 864000 = 24h;
+			expiration: expiration, // given in minutes - esri says
 			client: 'requestip',
 		});
 		
