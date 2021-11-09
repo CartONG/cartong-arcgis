@@ -26,7 +26,6 @@ CRUD.prototype={
 		http.onreadystatechange = function() {//Call a function when the state changes.
 			if(http.readyState == 4 && http.status == 200) {
 				//console.log(http.responseText);
-				//tryReload(http.responseText,'add');
 				if (callback) { callback(http.responseText); }//,'add');
 				promise.resolve(readCrudResponse(http.responseText))
 			}

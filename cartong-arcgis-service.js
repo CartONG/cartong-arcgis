@@ -34,7 +34,8 @@ $(function() {
     returnTrueCurves: false,
     returnExtentsOnly: false,
     queryByDistance: null,
-    f: 'json' //'geojson'
+    f: 'json', //'geojson'
+    token: null
   };
 
   /**
@@ -183,9 +184,9 @@ $(function() {
       .fail(function(err) {
         const msgError = (err.error ? err.error.message : '')
         promise.reject({
-          error: { message: 'Service error' + (msgError != '' ? ': ' + msgError : '' ) + '.' }
+          error: { message: 'Service error' + (msgError != '' ? ': ' + msgError : '' ) + ' (' + this.url + ').' }
         });
-      });
+      }.bind(this));
     
     return promise;
   }
@@ -198,8 +199,11 @@ $(function() {
       return;
     }
     
+    //TODO: fix this
+    const encodedAttrValues = attribute[1].map(function(value) { return '%27'+value+'%27' })
     var queryUrl = setParams(this.mapServiceQueryUrl, {
-      where: attribute[0] + '+IN+%28%27' + attribute[1].toString() + '%27%29'
+      where: attribute[0] + '+IN+%28' + ( encodedAttrValues.toString() ) + '%29',
+      objectIdList: ''
     });
     //var fullUrl = this.url + queryUrl;
     //this.query(fullUrl, params)
@@ -209,8 +213,7 @@ $(function() {
           promise.reject([]);
           return;
         }
-        json = truncateCoordinates(json);
-        promise.resolve(json.features);
+        promise.resolve(json);
       })
       .fail(function(err) {
         promise.reject(err);
@@ -226,6 +229,8 @@ $(function() {
     //var queryParams = {}
     params = params || {};
     params.resultOffset = 0;
+
+    if (this.getToken()) { params.token = this.getToken() }
 
     this.queryNextFeatures(params, [], promise);
 
